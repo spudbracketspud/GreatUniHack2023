@@ -2,7 +2,10 @@ import cv2
 import numpy as np
 
 def processImage(path):
-    image = cv2.imread('deforrestedCubeTest.jpg')
+    try:
+        image = cv2.imread(path)
+    except:
+        return -1
     hsv_image = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
     lower_green = np.array([35, 50, 50])
