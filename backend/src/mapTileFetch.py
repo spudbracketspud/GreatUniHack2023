@@ -6,7 +6,7 @@ import urllib.request
 import ssl
 import math
 
-API_KEY = "AIzaSyBhCM71caTVu_CY8UWTR6NjBzmcc3poOR0"
+API_KEY = "AIzaSyD7lLYDxML-ngabV_hdr2oM3-V6tpvgxt8"
 VIEWPORT_BASE_URL = "https://tile.googleapis.com/tile/v1/viewport"
 TILES_BASE_URL = "https://tile.googleapis.com/v1/2dtiles"  
 SESSION_BASE_URL = "https://tile.googleapis.com/v1/createSession"
@@ -69,7 +69,8 @@ def fetch_session_token(API_KEY,map_type,styles=None):
         "mapType":map_type,
         "language":"en-UK",
         "region":"UK",
-        "imageFormat":"png"
+        "imageFormat":"png",
+        "highDpi":"true"
         }
     ).encode()
 
@@ -81,14 +82,14 @@ def fetch_session_token(API_KEY,map_type,styles=None):
 
 
 """
-Fetches the list of tile co-ordinates within a specified
-rectangular section of the world map.
+Fetches a set of bounded rectangles in latitude and longitude with the maximum
+zoom that can be obtained on that area, in descending order of size
 
 lat_bound: Pair of integers in the range (-90,90) defining the north/south bounds of the rectangle.
 lat_bound: Pair of integers in the range (-90,90) defining the east/west bounds of the rectangle.
 zoom: Max zoom level of the tiles
 """
-def fetch_map_tile_coords(API_KEY,SESSION_TOKEN,lat_bound,long_bound,zoom):
+def fetch_map_tile_bounds(API_KEY,SESSION_TOKEN,lat_bound,lon_bound,zoom):
 
     # join url parts together in one string
     params = urllib.parse.urlencode(
@@ -96,7 +97,7 @@ def fetch_map_tile_coords(API_KEY,SESSION_TOKEN,lat_bound,long_bound,zoom):
         "session":SESSION_TOKEN,"key":API_KEY,
         "zoom":zoom,
         "north":lat_bound[0],"south":lat_bound[1],
-        "east":long_bound[0],"west":long_bound[1]
+        "east":lon_bound[0],"west":lon_bound[1]
         }
     )
 
@@ -104,21 +105,15 @@ def fetch_map_tile_coords(API_KEY,SESSION_TOKEN,lat_bound,long_bound,zoom):
 
     return make_request(url,json_key="maxZoomRects")
 
-def fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat,lon,zoom):
+def fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat_bound,lon_bound,zoom):
+    lat = (lat_bound[0] + lat_bound[1]) / 2
+    lon = (lon_bound[0] + lon_bound[1]) / 2
 
-    lat_rad = (lat*math.pi) / 180
-    if lat_rad == 0:
-        lat_rad += 0.0001
-    
-    n = 2 ** zoom
-    tile_x = int(n * ((lon + 180) / 360))
-    tile_y = int(n * (1 - (math.log(math.tan(lat_rad) + (1/math.sin(lat_rad))) / math.pi)) / 2)
-    print([tile_x,tile_y])
-  
+    tile_x, tile_y = lat_lon_to_tile(lat,lon,zoom)
+
     params = urllib.parse.urlencode(
         {
         "session":SESSION_TOKEN,"key":API_KEY,
-        "orientation":0
         }
     )
 
@@ -126,11 +121,46 @@ def fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat,lon,zoom):
     print(url)
 
     make_request(url)
+"""
+given a bounded rectangle by latitude and longitude
+and the max zoom on that area
+determine the zoom such that the resulting map tile would cover the whole area
+"""
+def zoom_out(lat_bound,lon_bound,zoom):
+    tile_x0, tile_y0 = lat_lon_to_tile(lat_bound[0],lon_bound[0],zoom)
+    tile_x1, tile_y1 = lat_lon_to_tile(lat_bound[1],lon_bound[1],zoom)
+
+    tile_xgap = abs(tile_x1 - tile_x0)
+    tile_ygap = abs(tile_y1 -tile_y0)
+
+    print([tile_xgap,tile_ygap])
+
+    zoom_diff = math.log(max(tile_xgap,tile_ygap),2)
+    return math.floor(zoom - zoom_diff)
 
 
+def lat_lon_to_tile(lat,lon,zoom):
+    lat_rad = (lat*math.pi) / 180
+    if lat_rad == 0:
+        lat_rad += 0.0001
 
-SESSION_TOKEN = fetch_session_token(API_KEY,"roadmap")
-lat,lon = 60,22
-map_tile_coords = fetch_map_tile_coords(API_KEY,SESSION_TOKEN,(60,65),(20,22),22)
-zoom = map_tile_coords[-1]["maxZoom"]
+    n = 2 **(zoom)
+    tile_x = math.floor(n * ((lon + 180) / 360))
+    tile_y = math.floor(n * (1 - (math.log(math.tan(lat_rad) + (1/math.sin(lat_rad))) / math.pi)) / 2)
+
+    return tile_x,tile_y
+
+SESSION_TOKEN = fetch_session_token(API_KEY,"satellite")
+lat = (40,50)
+lon = (20,26)
+
+"""obtain maximum zoom possible on latitude-longitude area
+want the last item in the list as that gives the smallest area"""
+map_tile_coords = fetch_map_tile_bounds(API_KEY,SESSION_TOKEN,lat,lon,22)
+max_zoom = map_tile_coords[-1]["maxZoom"]
+
+#determine whether this needs to be zoomed out to cover the whole area
+ideal_zoom = zoom_out(lat,lon,max_zoom)
+zoom = min(max_zoom,ideal_zoom)
+
 print(fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat,lon,zoom))
