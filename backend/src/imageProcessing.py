@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 
-def processImage(path):
+def process(path):
     try:
         image = cv2.imread(path)
     except:
