@@ -1,4 +1,4 @@
 from flask import *
-import src.db
+import db
 
 
