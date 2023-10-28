@@ -1,5 +1,6 @@
 from flask import *
 import db
+import imageProcessing
 
 
 app = Flask(__name__)
@@ -14,3 +15,7 @@ def home():
 @app.route("/", methods=['GET', 'POST'])
 def home():
     return render_template('homePageLoggedIn.html')
+
+
+if __name__ = "__main__":
+    app.run(debug=True)
