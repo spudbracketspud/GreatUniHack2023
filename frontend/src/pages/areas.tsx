@@ -8,7 +8,7 @@ const rainforestImages = [
     src: 'image1.jpg',
     alt: 'Forest 1',
     text: 'Amazon Rainforest',
-    link : '/',
+    link : '/areas/amazon',
   },
   {
     src: 'image2.jpg',

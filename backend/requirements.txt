@@ -1,6 +1,5 @@
 flask
 flask-restx
 virtualenv
-opencv
-cv2
+opencv-python
 np
