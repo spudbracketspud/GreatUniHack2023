@@ -4,8 +4,8 @@ import imageProcessing
 
 app = Flask(__name__)
 def getCaptures(location):
-    pass
-    #create json of all the map tile values
+    if location == "Amazon":
+        while
 
 #Home Pages
 @app.route("/", methods=['GET', 'POST'])
