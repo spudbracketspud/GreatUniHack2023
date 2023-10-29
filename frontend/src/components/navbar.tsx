@@ -24,21 +24,15 @@ const NavBarButton: React.FC<ButtonProps> = (props) => {
 
 function NavBar() {
   return (
-    <div className="fixed w-full z-50 font-display justify-between text-cultured h-16 flex flex-row flex-wrap border-b-[1px] bg-white bg-opacity-80">
-      {/* Add the bg-opacity-80 class to make the background opaque */}
+    <div className="fixed w-full z-50 font-display justify-between text-cultured h-16 flex flex-row flex-wrap border-b-[1px] bg-white">
       <Link href="/" className="mt-auto mb-auto pl-20 pr-8">
         <h1 className="mt-auto mb-auto text-2xl font-display font-semibold text-jade">Log-A-Log</h1>
       </Link>
 
       <div className="flex flex-row flex-wrap pl-8 pr-20 space-x-4">
         {/* TODO add urls */}
-        <Link href="/areas"> 
-          <a>
-            <NavBarButton value="Areas" url="/areas" />
-          </a>
-        </Link>
+        <NavBarButton value="Areas" url="/areas" />
         <NavBarButton value="Trends" url="/" />
-
         <NavBarButton value="About Us" url="/" />
         <NavBarButton value="Donate" url="/" accent={true} />
       </div>

@@ -17,6 +17,9 @@ module.exports = {
         rosybrown: '#B08285',
         eerieblack: '#172121',
       },
+      backgroundImage: {
+        'forest-homepage': "url('/public/forest_background_home.jpg')",
+      }
     },
   },
   plugins: [],

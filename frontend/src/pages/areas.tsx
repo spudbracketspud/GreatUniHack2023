@@ -36,11 +36,11 @@ function AreasPage() {
     <div className="flex flex-col items-center">
       <NavBar />
       <Container>
-        <div className="grid grid-cols-1 gap-10">
+        <div className="flex flex-col space-y-16 pt-24 pb-28 ml-32 mr-32">
           {rainforestImages.map((image, index) => (
             <Link href={image.link} key={index}>
-              <a>
-                <div className="rounded-lg overflow-hidden transition-transform transform hover:scale-105 p-4 w-4/5 mx-auto relative">
+              {/* <a> */}
+                <div className="rounded-lg overflow-hidden transition-transform transform hover:scale-105 p-4 w-4/5 mx-auto relative duration-200">
                   <div style={{ paddingTop: '25%' }}> {/* Set the padding-top to 25% */}
                     <img
                       src={image.src}
@@ -52,7 +52,7 @@ function AreasPage() {
                     <p className="mt-auto mb-auto text-2xl font-display font-semibold text-white p-2 relative inline-block">{image.text}</p>
                   </div>
                 </div>
-              </a>
+              {/* </a> */}
             </Link>
           ))}
         </div>

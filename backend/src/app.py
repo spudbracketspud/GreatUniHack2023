@@ -3,6 +3,9 @@ import db
 import imageProcessing
 
 app = Flask(__name__)
+def getCaptures(location):
+    if location == "Amazon":
+        while
 
 #Home Pages
 @app.route("/", methods=['GET', 'POST'])
@@ -10,9 +13,10 @@ def home():
     #Database Authentication for user
     return render_template('homePage.html')
 
-@app.route("/amazon", methods=['GET', 'POST'])
+@app.route("/amazon", methods=['GET'])
 def Amazon():
-    return render_template('amazonHome.html')
+
+    return 
 
 @app.route("/ankoro", methods=['GET', 'POST'])
 def Amazon():
