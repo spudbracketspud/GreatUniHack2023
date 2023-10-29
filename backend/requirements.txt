@@ -3,3 +3,4 @@ flask-restx
 virtualenv
 opencv
 cv2
+np
