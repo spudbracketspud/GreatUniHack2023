@@ -6,26 +6,26 @@ import Link from 'next/link'; // Import the Link component
 const rainforestImages = [
   {
     src: 'image1.jpg',
-    alt: 'Rainforest 2',
+    alt: 'Forest 1',
     text: 'Amazon Rainforest',
-    link : '/help',
+    link : '/',
   },
   {
     src: 'image2.jpg',
-    alt: 'Rainforest 3',
+    alt: 'Forest 2',
     text: 'Siberia/Russia Boreal Forests',
     link: '/',
   },
   {
     src: 'image3.jpg',
-    alt: 'Rainforest 3',
-    text: 'Ethiopia',
+    alt: 'Forest 3',
+    text: 'Indonesia',
     link: '/',
   },
   {
     src: 'image4.jpg',
-    alt: 'Chad',
-    text: '',
+    alt: 'Forest 4',
+    text: 'Tanzania',
     link: '/',
   },
   // can add more images 
@@ -40,7 +40,7 @@ function AreasPage() {
           {rainforestImages.map((image, index) => (
             <Link href={image.link} key={index}>
               {/* <a> */}
-                <div className="rounded-lg overflow-hidden transition-transform transform hover:scale-105 p-4 w-4/5 mx-auto relative duration-200">
+                <div className="rounded-lg overflow-hidden transition-transform transform hover:scale-105 p-4 w-4/5 mx-auto relative duration-200 shadow-xl hover:shadow-2xl">
                   <div style={{ paddingTop: '25%' }}> {/* Set the padding-top to 25% */}
                     <img
                       src={image.src}

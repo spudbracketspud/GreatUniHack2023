@@ -1,27 +1,38 @@
 from flask import *
-import db
+#import db
 import imageProcessing
+import os
 
 app = Flask(__name__)
 def getCaptures(location):
+    foliageList = []
     if location == "Amazon":
-        while
+        prefix = 'a'
+        
+    filePath = "captures/"+prefix #capture/a or capture/i
+    i = 1
+    while (os.path.exists(filePath+str(i)+".jpeg")): 
+        
+        foliageList.append(imageProcessing.process(filePath+str(i)+".jpeg"))
+        i += 1
+    return foliageList
+
 
 #Home Pages
-@app.route("/", methods=['GET', 'POST'])
-def home():
-    #Database Authentication for user
-    return render_template('homePage.html')
+# @app.route("/", methods=['GET', 'POST'])
+# def home():
+#     #Database Authentication for user
+#     return render_template('homePage.html')
 
-@app.route("/amazon", methods=['GET'])
-def Amazon():
+# @app.route("/amazon", methods=['GET'])
+# def Amazon():
 
-    return 
+#     return 
 
-@app.route("/ankoro", methods=['GET', 'POST'])
-def Amazon():
-    return render_template('ankoro.html')
+# @app.route("/ankoro", methods=['GET', 'POST'])
+# def Amazon():
+#     return render_template('ankoro.html')
 
 if __name__ == "__main__":
-    #imageProcessing.processImage('greenCubeTest.jpeg')  -> returns a float of colour of green percentage
+    print(getCaptures("Amazon"))
     app.run(debug=True)

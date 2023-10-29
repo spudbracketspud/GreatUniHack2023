@@ -18,7 +18,7 @@ module.exports = {
         eerieblack: '#172121',
       },
       backgroundImage: {
-        'forest-homepage': "url('/public/forest_background_home.jpg')",
+        'forest-homepage': "url('/forest_background_home.jpg')",
       }
     },
   },
