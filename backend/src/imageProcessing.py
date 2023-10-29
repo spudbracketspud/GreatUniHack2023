@@ -19,7 +19,7 @@ def process(path):
         # cv2.imshow('Green Mask', green_mask)
         # cv2.waitKey(0)
         # cv2.destroyAllWindows()
-    except:
-        return -1
+    except Exception as e:
+       return e
     return green_percentage
 
