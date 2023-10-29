@@ -6,26 +6,26 @@ import Link from 'next/link'; // Import the Link component
 const rainforestImages = [
   {
     src: 'image1.jpg',
-    alt: 'Rainforest 1',
+    alt: 'Rainforest 2',
     text: 'Amazon Rainforest',
-    link : '/',
+    link : '/help',
   },
   {
-    src: 'image1.jpg',
-    alt: 'Rainforest 2',
+    src: 'image2.jpg',
+    alt: 'Rainforest 3',
     text: 'Siberia/Russia Boreal Forests',
     link: '/',
   },
   {
-    src: 'image1.jpg',
+    src: 'image3.jpg',
     alt: 'Rainforest 3',
     text: 'Ethiopia',
     link: '/',
   },
   {
-    src: 'image1.jpg',
-    alt: 'Rainforest 4',
-    text: 'Rainforest 4',
+    src: 'image4.jpg',
+    alt: 'Chad',
+    text: '',
     link: '/',
   },
   // can add more images 
