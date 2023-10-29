@@ -6,11 +6,21 @@ import urllib.request
 import ssl
 import math
 
+#requires api key with map tiles access enabled
 API_KEY = input()
 VIEWPORT_BASE_URL = "https://tile.googleapis.com/tile/v1/viewport"
 TILES_BASE_URL = "https://tile.googleapis.com/v1/2dtiles"  
 SESSION_BASE_URL = "https://tile.googleapis.com/v1/createSession"
 SSL_CONTEXT = ssl._create_unverified_context() #DO NOT PUSH TO PRODUCTION
+
+global img_format
+img_format = "jpeg"
+
+#example configuration - fetches amazon rainforest :)
+zoom = 8
+lat = (3,-12)
+lon = (-80,-47)
+root_name = "a"
 
 """
 Generic function for posting url requests
@@ -53,9 +63,15 @@ def make_request(url,data=None,json_key=None):
         time.sleep(current_delay)
         current_delay *= 2  # increase the delay each time we retry
 
+"""
+fetches an image from a given url and outputs to the file path/filename
 
+url: the url to fetch from
+path: the folder to store the image in
+filename: the same of the file (requires format extension)
+
+"""
 def fetch_image(url,path,filename):
-    print(url)
     path = f"{path}/{filename}"
     current_delay = 0.1 # set initial retry delay to 100ms
     max_delay = 3 # set max retry delay to 5s
@@ -98,7 +114,7 @@ def fetch_session_token(API_KEY,map_type,styles=None):
         "mapType":map_type,
         "language":"en-UK",
         "region":"UK",
-        "imageFormat":"png",
+        "imageFormat":img_format,
         "highDpi":"true"
         }
     ).encode()
@@ -115,7 +131,7 @@ Fetches a set of bounded rectangles in latitude and longitude with the maximum
 zoom that can be obtained on that area, in descending order of size
 
 lat_bound: Pair of integers in the range (-90,90) defining the north/south bounds of the rectangle.
-lat_bound: Pair of integers in the range (-90,90) defining the east/west bounds of the rectangle.
+lon_bound: Pair of integers in the range (-180,180) defining the east/west bounds of the rectangle.
 zoom: Max zoom level of the tiles
 """
 def fetch_map_tile_bounds(API_KEY,SESSION_TOKEN,lat_bound,lon_bound,zoom):
@@ -134,24 +150,53 @@ def fetch_map_tile_bounds(API_KEY,SESSION_TOKEN,lat_bound,lon_bound,zoom):
 
     return make_request(url,json_key="maxZoomRects")
 
-def fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat_bound,lon_bound,zoom):
+
+"""
+Fetches images from a bounded latitude/longitude rectangle at a given zoom level (if possible)
+
+lat_bound: Pair of integers in the range (-90,90) defining the north/south bounds of the rectangle.
+lon_bound: Pair of integers in the range (-180,180) defining the east/west bounds of the rectangle.
+zoom: Zoom level of images. Will determine the number of images provided - higher zoom = more images
+base_name: Root name for images. Images are saved as "(name)(number).(format)"
+"""
+def fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat_bound,lon_bound,zoom,base_name):
     tile_x0, tile_y0 = lat_lon_to_tile(lat_bound[0],lon_bound[0],zoom)
     tile_x1, tile_y1 = lat_lon_to_tile(lat_bound[1],lon_bound[1],zoom)
 
+    # swap elements if 0 is greater than 1
+    if tile_x0 > tile_x1:
+        temp = tile_x0
+        tile_x0 = tile_x1
+        tile_x1 = temp
+    if tile_y0 > tile_y1:
+        temp = tile_y0
+        tile_y0 = tile_y1
+        tile_y1 = temp
+
+    # download images
+    total = (tile_x1 - tile_x0 + 1) * (tile_y1 - tile_y0 + 1)
+    count = 1
     for i in range(tile_y0,tile_y1+1):
-        for j in range(tile_y0,tile_y1+1):
-
-
+        for j in range(tile_x0,tile_x1+1):
             params = urllib.parse.urlencode(
-                {
-                "session":SESSION_TOKEN,"key":API_KEY,
-                }
+                {"session":SESSION_TOKEN,"key":API_KEY,}
             )
 
-            url = f"{TILES_BASE_URL}/{zoom}/{i}/{j}?{params}"
-            name = f"test{i}{j}"
+            url = f"{TILES_BASE_URL}/{zoom}/{j}/{i}?{params}"
+            name = f"{base_name}{count}.{img_format}"
             fetch_image(url,"captures",name)
+
+            msg = f"Fetching images at:{([zoom,j,i])} ({count}/{total})"
+            print(msg)
+
+            count += 1
+            time.sleep(0.5)
+
+    print("Download complete.")
+
+
 """
+NOT USED
 given a bounded rectangle by latitude and longitude
 and the max zoom on that area
 determine the zoom such that the resulting map tile would cover the whole area
@@ -160,13 +205,8 @@ def zoom_out(lat_bound,lon_bound,zoom):
     tile_x0, tile_y0 = lat_lon_to_tile(lat_bound[0],lon_bound[0],zoom)
     tile_x1, tile_y1 = lat_lon_to_tile(lat_bound[1],lon_bound[1],zoom)
 
-    print([tile_x0,tile_y0])
-    print([tile_x1,tile_y1])
-
     tile_xgap = abs(tile_x1 - tile_x0) + 1
     tile_ygap = abs(tile_y1 -tile_y0) + 1
-
-    print([tile_xgap,tile_ygap])
 
     zoom_diff = math.log(max(tile_xgap,tile_ygap),2)
     return math.floor(zoom - zoom_diff)
@@ -174,28 +214,24 @@ def zoom_out(lat_bound,lon_bound,zoom):
 
 def lat_lon_to_tile(lat,lon,zoom):
     lat_rad = (lat*math.pi) / 180
-    if math.sin(lat_rad) == 0:
+    if math.cos(lat_rad) == 0:
         lat_rad += 0.0001
 
     n = 2 **(zoom)
     tile_x = math.floor(n * ((lon + 180) / 360))
-    tile_y = math.floor(n * (1 - (math.log(math.tan(lat_rad) + (1/math.sin(lat_rad))) / math.pi)) / 2)
+    tile_y = math.floor(n * (1 - (math.log(math.tan(lat_rad) + (1/math.cos(lat_rad))) / math.pi)) / 2)
 
     return tile_x,tile_y
 
+
 SESSION_TOKEN = fetch_session_token(API_KEY,"satellite")
-lat = (40,40.5)
-lon = (20,20.5)
 
 """obtain maximum zoom possible on latitude-longitude area
 want the last item in the list as that gives the smallest area"""
-map_tile_coords = fetch_map_tile_bounds(API_KEY,SESSION_TOKEN,lat,lon,10)
-print(map_tile_coords)
+map_tile_coords = fetch_map_tile_bounds(API_KEY,SESSION_TOKEN,lat,lon,zoom)
 max_zoom = map_tile_coords[-1]["maxZoom"]
-fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat,lon,max_zoom)
 
-#determine whether this needs to be zoomed out to cover the whole area
-# ideal_zoom = zoom_out(lat,lon,max_zoom)
-# print([max_zoom,ideal_zoom])
-# zoom = min(max_zoom,ideal_zoom)
+
+image_zoom = min(zoom,max_zoom)
+fetch_map_tile_images(API_KEY,SESSION_TOKEN,lat,lon,image_zoom,root_name)
 
