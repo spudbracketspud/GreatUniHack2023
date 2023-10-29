@@ -54,13 +54,15 @@ if __name__ == "__main__":
             x.append(j)
             y.append(i)
         
-
+    colormap = plt.get_cmap('brg')
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
-    ax.scatter(x, y, foliageArray, c='b', marker='o')
+    ax.scatter(x, y, foliageArray, c=foliageArray, marker='v', cmap=colormap)
     ax.set_xlabel('Latatude')
     ax.set_ylabel('Longditude')
     ax.set_zlabel('Green Percentage')
     ax.set_title('3D Scatter Plot Example')
+    ax.grid(True)
+
     plt.show()
     app.run(debug=False)
