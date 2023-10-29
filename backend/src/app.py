@@ -44,7 +44,7 @@ if __name__ == "__main__":
     print(foliagePercnt)
     averageFoliage = sum(foliagePercnt) / len(foliagePercnt)
     #assuming width is 2
-    width = 3
+    width = 16
     tempRow = []
     foliageArray = [foliagePercnt[i:i+width] for i in range(0, len(foliagePercnt), width)]
     x = []
