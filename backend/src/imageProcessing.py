@@ -16,9 +16,9 @@ def process(path):
 
         total_pixel_count = green_mask.size
         green_percentage = (green_pixel_count / (total_pixel_count) * 100)
-        cv2.imshow('Green Mask', green_mask)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
+        # cv2.imshow('Green Mask', green_mask)
+        # cv2.waitKey(0)
+        # cv2.destroyAllWindows()
     except:
         return -1
     return green_percentage
