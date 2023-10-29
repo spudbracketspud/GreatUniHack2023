@@ -34,7 +34,7 @@ function NavBar() {
         <NavBarButton value="Areas" url="/areas" />
         <NavBarButton value="Trends" url="/" />
         <NavBarButton value="About Us" url="/" />
-        <NavBarButton value="Donate" url="/" accent={true} />
+        <NavBarButton value="How to Help" url="/help" accent={true} />
       </div>
     </div>
   );
